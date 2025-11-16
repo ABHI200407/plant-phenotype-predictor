@@ -1,4 +1,4 @@
-print("🚀 Training ML model for plant phenotypes...")
+print(" Training ML model for plant phenotypes...")
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
