@@ -1,0 +1,14 @@
+flask
+redis
+celery
+torch
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+scipy
+flask-cors 
+flask-sqlalchemy
+psycopg2-binary
+flask-jwt-extended

@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # 1. The Message Broker
+  redis:
+    image: redis:alpine
+    container_name: pheno_redis
+    ports:
+      - "6379:6379"
+
+  # 2. The Backend (Flask)
+  web:
+    build: .
+    container_name: pheno_backend
+    command: python app.py
+    ports:
+      - "5000:5000"
+    volumes:
+      # This maps your Windows folder to the container.
+      # Your database file 'local.db' will appear in your Windows folder.
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      # Force usage of SQLite
+      - DATABASE_URL=sqlite:////app/local.db
+      - FLASK_DEBUG=1
+    depends_on:
+      - redis
+
+  # 3. The AI Worker (Celery)
+  worker:
+    build: .
+    container_name: pheno_worker
+    command: celery -A tasks.celery worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      # Worker needs DB access too to save results
+      - DATABASE_URL=sqlite:////app/local.db
+    depends_on:
+      - redis
